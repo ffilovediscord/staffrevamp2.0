@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HLH Official Staff Portal</title>
+    <!-- Favicon: Inline SVG as Data URI -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b5cf6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'%3E%3C/path%3E%3C/svg%3E">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for dark mode */
+        .dark ::-webkit-scrollbar {
+            width: 8px;
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: #333;
+            border-radius: 10px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 10px;
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #777;
+        }
+        /* Style for SVG icons */
+        .icon-svg {
+            width: 20px; /* Adjust size as needed */
+            height: 20px; /* Adjust size as needed */
+            fill: currentColor; /* Inherit text color */
+        }
+        .icon-svg-lg {
+            width: 32px; /* Adjust size as needed */
+            height: 32px; /* Adjust size as needed */
+            fill: currentColor; /* Inherit text color */
+        }
+    </style>
+</head>
+<body class="dark">
+    <div id="root"></div>
+
+    <!-- React and ReactDOM CDNs -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+
+    <script type="text/babel">
+        // Ensure all scripts and DOM are loaded before running the React app
+        window.onload = () => { 
+            const { useState, useEffect, useRef } = React;
+            
+            // Define icons using emojis or inline SVGs
+            const Icon = {
+                Info: () => <span>📜</span>, // Changed from ℹ️ to 📜
+                Lightbulb: () => <span>💡</span>,
+                ListOrdered: () => <span>📊</span>, // Chart/rankings
+                User: () => <span>👤</span>,
+                Zap: () => <span>⚡</span>, // For FAQs, can be a question mark too
+                Crown: () => <span>👑</span>,
+                ExternalLink: () => <span>🔗</span>,
+                Sun: () => <span>☀️</span>,
+                Moon: () => <span>🌙</span>,
+                Shield: () => (
+                    <svg className="icon-svg-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                )
+            };
+
+
+            // Component for the Header
+            const Header = ({ serverName, darkMode, toggleDarkMode }) => (
+              <header className={`py-4 px-6 shadow-lg rounded-b-xl ${darkMode ? 'bg-gray-900 text-white' : 'bg-gradient-to-r from-purple-600 to-indigo-700 text-white'}`}>
+                <div className="container mx-auto flex justify-between items-center">
+                  <h1 className="text-3xl font-extrabold tracking-wide">
+                    {serverName}
+                  </h1>
+                  <button
+                    onClick={toggleDarkMode}
+                    className="p-2 rounded-full bg-gray-700 hover:bg-gray-600 text-white transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    aria-label="Toggle Dark Mode"
+                  >
+                    {darkMode ? <Icon.Sun /> : <Icon.Moon />}
+                  </button>
+                </div>
+              </header>
+            );
+
+            // Component for the Sidebar Navigation
+            const Sidebar = ({ activeSection, setActiveSection, darkMode }) => {
+              const sections = [
+                { name: 'Guidelines', icon: <Icon.Info />, target: 'Guidelines' },
+                { name: 'Moderation Tips', icon: <Icon.Lightbulb />, target: 'ModerationTips' },
+                { name: 'Rankings', icon: <Icon.ListOrdered />, target: 'Rankings' },
+                { name: 'Credits', icon: <Icon.User />, target: 'Credits' },
+                { name: 'FAQs', icon: <Icon.Zap />, target: 'FAQs' },
+                { name: 'Meetings', icon: <Icon.Crown />, target: 'Meetings' },
+              ];
+
+              const externalLinks = [
+                { name: 'Feedback', icon: <Icon.ExternalLink />, link: 'https://docs.google.com/forms/d/e/1FAIpQLSfAczK9aNTMxdD7wVeyt5ckMDA4QgrCp0ikgsNdlDk-rXhiqg/viewform?usp=dialog' },
+                { name: 'Discord', icon: <Icon.ExternalLink />, link: 'https://discord.gg/hcEzHpKu64' },
+              ];
+
+              const handleButtonClick = (targetSection) => {
+                setActiveSection(targetSection);
+                // For main sections, scroll to top of content area
+                setTimeout(() => window.document.getElementById('main-content-area')?.scrollTo({ top: 0, behavior: 'smooth' }), 100);
+              };
+
+              return (
+                <aside className={`w-64 flex-shrink-0 p-6 shadow-lg rounded-r-xl ${darkMode ? 'bg-gray-800 text-gray-200' : 'bg-white text-gray-800'}`}>
+                  <div className="flex items-center mb-8">
+                    <Icon.Shield className={`mr-3 ${darkMode ? 'text-purple-400' : 'text-indigo-600'}`} />
+                    <h2 className="text-2xl font-bold">StaffHub</h2>
+                  </div>
+                  <h3 className="text-lg font-semibold mb-4 border-b pb-2 border-gray-600">Staff Terms</h3>
+                  <nav>
+                    <ul>
+                      {sections.map((section) => (
+                        <li key={section.name} className="mb-2">
+                          <button
+                            onClick={() => handleButtonClick(section.target)}
+                            className={`flex items-center w-full px-4 py-2 rounded-lg text-lg font-medium transition-all duration-300 ease-in-out
+                              ${activeSection === section.target
+                                ? (darkMode ? 'bg-purple-700 text-white shadow-md' : 'bg-indigo-600 text-white shadow-md')
+                                : (darkMode ? 'text-gray-300 hover:bg-gray-700 hover:text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900')
+                              }`}
+                          >
+                            {section.icon}
+                            <span className="ml-3">{section.name}</span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </nav>
+
+                  {/* Separator for external links */}
+                  <div className="mt-8 pt-4 border-t border-gray-600">
+                    <h3 className="text-lg font-semibold mb-4 border-b pb-2 border-gray-600">Quick Links</h3>
+                    <nav>
+                      <ul>
+                        {externalLinks.map((linkItem) => (
+                          <li key={linkItem.name} className="mb-2">
+                            <a
+                              href={linkItem.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={`flex items-center w-full px-4 py-2 rounded-lg text-lg font-medium transition-all duration-300 ease-in-out
+                                ${darkMode ? 'text-gray-300 hover:bg-gray-700 hover:text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}
+                              `}
+                            >
+                              {linkItem.icon}
+                              <span className="ml-3">{linkItem.name}</span>
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </nav>
+                  </div>
+                </aside>
+              );
+            };
+
+            // Component to display dynamic content based on active section
+            const ContentDisplay = ({ activeSection, darkMode }) => {
+              const contentClasses = `p-8 rounded-xl shadow-lg ${darkMode ? 'bg-gray-800 text-gray-200' : 'bg-white text-gray-800'}`;
+              const headingClasses = `text-3xl font-bold mb-6 ${darkMode ? 'text-purple-400' : 'text-indigo-700'}`;
+              const subHeadingClasses = `text-2xl font-semibold mt-8 mb-4 ${darkMode ? 'text-gray-100' : 'text-gray-700'}`;
+              const paragraphClasses = `mb-4 leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-600'}`;
+              const listClasses = `list-disc list-inside mb-4 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`;
+
+              const renderContent = () => {
+                switch (activeSection) {
+                  case 'Guidelines':
+                    return (
+                      <div className={contentClasses}>
+                        <h2 className={headingClasses}>Staff Terms And Conditions</h2>
+
+                        <h3 className={subHeadingClasses}>How We Go</h3>
+                        <p className={paragraphClasses}>
+                          Be respectful and professional with everyone, whether it’s fellow staff or community members. A good tone and friendly attitude go a long way in building trust and setting the right example.
+                        </p>
+                        <p className={paragraphClasses}>
+                          Keep things confidential. Never share private staff conversations, server logs, or sensitive user information outside the staff team. Confidentiality builds safety and respect.
+                        </p>
+                        <p className={paragraphClasses}>
+                          Steer clear of drama, arguments, or toxic behavior. We want a community where everyone feels welcome and safe. Let your conduct reflect the kind of space you want to be in.
+                        </p>
+                        <p className={paragraphClasses}>
+                          Remember, you are a role model. Your behavior directly impacts the server’s vibe, member retention, and overall atmosphere.
+                        </p>
+
+                        <h3 className={subHeadingClasses}>Dealing with Punishments</h3>
+                        <ul className={listClasses}>
+                          <li><strong>Warnings:</strong> Use these when a rule is broken for the first time. Explain the rule clearly and give the user a chance to correct their behavior.</li>
+                          <li><strong>Mutes:</strong> Apply mutes when warnings are ignored, or for spam, mild harassment, or trolling. Keep it short-term unless behavior continues.</li>
+                          <li><strong>Kicks:</strong> Use kicks as a final escalation step for repeat issues or more serious offenses. Always provide a clear reason in the kick message.</li>
+                          <li><strong>Bans:</strong> Ban only when the user has committed serious offenses like hate speech, doxxing, or severe toxicity. Document it and notify senior staff.</li>
+                        </ul>
+                        <p className={paragraphClasses}>
+                          Always act calmly, fairly, and clearly. If unsure, always ask a senior team member before taking serious action like banning.
+                        </p>
+
+                        <h3 className={subHeadingClasses}>Handling Reports</h3>
+                        <p className={paragraphClasses}>
+                          Always respond quickly and respectfully to reports. Investigate carefully, gather solid evidence (screenshots, logs), and avoid acting on hearsay alone.
+                        </p>
+                        <p className={paragraphClasses}>
+                          Once resolved, update the reporter if appropriate, and keep all discussions within staff-only channels. Transparency within staff is important; confidentiality outside is critical.
+                        </p>
+
+                        <h3 className={subHeadingClasses}>What to Do Daily</h3>
+                        <p className={paragraphClasses}>
+                          Check on conversations across channels regularly to ensure things stay friendly and rule-abiding. Be helpful to new users and engage positively in chat.
+                        </p>
+                        <p className={paragraphClasses}>
+                          Stay active in staff discussions and participate in team decisions. Help monitor alerts from bots and keep an eye on audit logs.
+                        </p>
+
+                        <h3 className={subHeadingClasses}>Chatting with Staff</h3>
+                        <ul className={listClasses}>
+                          <li>💬┃staff-chat – for daily check-ins, coordination, and team help.</li>
+                          <li>📢┃staff-announcements – for server updates and internal memos.</li>
+                          <li>🎭┃staff-shitpost – to relax, share memes, and keep morale up (without going overboard).</li>
+                        </ul>
+                        <p className={`${paragraphClasses} italic text-right`}>— The Admin Team</p>
+                      </div>
+                    );
+                  case 'ModerationTips':
+                    return (
+                      <div className={contentClasses}>
+                        <h2 className={headingClasses}>Moderation Tips</h2>
+                        <ul className={listClasses}>
+                          <li>📌 Stay calm and neutral when resolving conflicts. Emotion-driven responses often escalate issues.</li>
+                          <li>🧾 Log every punishment action in the appropriate staff channel, even if it’s minor. Transparency is key.</li>
+                          <li>📷 Collect evidence whenever possible before acting. Screenshots or logs help justify decisions later.</li>
+                          <li>🛠️ Use available moderation tools like slowmode, mute timers, or auto-responses to ease your workload.</li>
+                        </ul>
+                      </div>
+                    );
+                  case 'Credits':
+                    return (
+                      <div className={contentClasses}>
+                        <h2 className={headingClasses}>Credits</h2>
+                        <p className={paragraphClasses}>Site made by <strong className={darkMode ? 'text-purple-300' : 'text-indigo-600'}>arduinoisadev</strong></p>
+                        <h3 className={subHeadingClasses}>Staff Team:</h3>
+                        <ul className={listClasses}>
+                          <li><strong className={darkMode ? 'text-purple-300' : 'text-indigo-600'}>gino12.2</strong> - Admin</li>
+                          <li><strong className={darkMode ? 'text-purple-300' : 'text-indigo-600'}>chrismic21</strong> - Head Mod</li>
+                          <li><strong className={darkMode ? 'text-purple-300' : 'text-indigo-600'}>nik_bho325</strong> - Owner</li>
+                          {/* Add more staff members as needed */}
+                        </ul>
+                      </div>
+                    );
+                  case 'FAQs':
+                    return (
+                      <div className={contentClasses}>
+                        <h2 className={headingClasses}>Frequently Asked Questions</h2>
+                        <p className={paragraphClasses}>
+                          This section will contain answers to common questions staff members might have.
+                          <br />
+                          (Content to be added here)
+                        </p>
+                        <h3 className={subHeadingClasses}>Q: How do I report a bug on the server?</h3>
+                        <p className={paragraphClasses}>
+                          A: Please use the dedicated `#bug-reports` channel in the staff Discord. Provide as much detail as possible, including screenshots or video recordings.
+                        </p>
+                        <h3 className={subHeadingClasses}>Q: What is the policy on AFK staff members?</h3>
+                        <p className={paragraphClasses}>
+                          A: Staff members are expected to be active and engaged. If you need to be AFK for an extended period, please notify a senior staff member.
+                        </p>
+                      </div>
+                    );
+                  case 'Meetings':
+                    return (
+                      <div className={contentClasses}>
+                        <h2 className={headingClasses}>Meetings</h2>
+                        <p className={paragraphClasses}>
+                          We host regular meetings to align on moderation standards, review any issues, and discuss ways to improve the server. These are important moments to make your voice heard, bring up suggestions, and learn about upcoming changes.
+                        </p>
+                        <p className={paragraphClasses}>
+                          Always come prepared by reviewing the agenda ahead of time if it's posted. Take notes if needed and ask questions if anything is unclear.
+                        </p>
+                      </div>
+                    );
+                  case 'Rankings':
+                    return (
+                      <div className={contentClasses}>
+                        <h2 className={headingClasses}>Staff Rankings</h2>
+                        <p className={paragraphClasses}>
+                          There are many ranks within the HLH Team, and that's why they are shown here:
+                        </p>
+
+                        <h3 className={subHeadingClasses}>STAFF RANKS:</h3>
+                        <ul className={listClasses}>
+                          <li><strong>Owner:</strong> The Founder of the Discord server, the one in command of everything.</li>
+                          <li><strong>Co Owner:</strong> The second owner chosen by the server's founder.</li>
+                          <li><strong>Administrator:</strong> A trusted staff member in charge of helping with the server's problems and moderating other members.</li>
+                          <li><strong>Senior Moderator:</strong> A professional moderator that is in charge of taking action against members in case of breaking rules (can ban, kick, mute and warn).</li>
+                          <li><strong>Moderator:</strong> A regular moderator in charge of taking action against members in case of breaking rules. (can kick, mute and warn)</li>
+                          <li><strong>Trial Moderator:</strong> A newbie moderator going through a learning course in the staff team. (can warn and mute)</li>
+                          <li><strong>Helper:</strong> A staff member in charge of assisting members and taking care of small rule breakers. (can warn, modify channels, roles etc.)</li>
+                        </ul>
+
+                        <h3 className={subHeadingClasses}>HOW TO RANK UP:</h3>
+                        <p className={paragraphClasses}>
+                          In order to rank up, you must be active and worthy to be promoted.
+                        </p>
+
+                        <h3 className={subHeadingClasses}>MINIMUM REQUIREMENTS:</h3>
+                        <p className={paragraphClasses}>
+                          Must not have gotten at least 3 warns and 3 timeouts in the last week; higher-ups will consider your actions and decide.
+                        </p>
+                      </div>
+                    );
+                  default:
+                    return (
+                      <div className={contentClasses}>
+                        <h2 className={headingClasses}>Welcome</h2>
+                        <p className={paragraphClasses}>Please select a section from the sidebar.</p>
+                      </div>
+                    );
+                }
+              };
+
+              return (
+                <div className="flex-grow p-4">
+                  {renderContent()}
+                </div>
+              );
+            };
+
+            // Main App Component
+            const App = () => {
+              const [activeSection, setActiveSection] = useState('Guidelines');
+              const [darkMode, setDarkMode] = useState(true); // Dark mode is default
+              const mainContentRef = useRef(null); // Ref for the main content area
+
+              // Function to toggle dark mode
+              const toggleDarkMode = () => {
+                setDarkMode(prevMode => !prevMode);
+              };
+
+              // Function to scroll to a specific section within the main content
+              const scrollToSection = (id) => {
+                const element = document.getElementById(id);
+                if (element && mainContentRef.current) {
+                  // Calculate scroll position relative to the main content area
+                  const offset = element.getBoundingClientRect().top - mainContentRef.current.getBoundingClientRect().top;
+                  mainContentRef.current.scrollTo({
+                    top: offset,
+                    behavior: 'smooth'
+                  });
+                }
+              };
+
+              // Apply dark mode class to body
+              useEffect(() => {
+                if (darkMode) {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
+              }, [darkMode]);
+
+              return (
+                <div className={`min-h-screen font-inter antialiased flex flex-col ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+                  <Header serverName="HLH Official Staff Portal" darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+
+                  <div className="flex flex-1">
+                    <Sidebar activeSection={activeSection} setActiveSection={setActiveSection} darkMode={darkMode} scrollToSection={scrollToSection} />
+                    <main id="main-content-area" ref={mainContentRef} className="flex-1 p-4 overflow-y-auto">
+                      <ContentDisplay activeSection={activeSection} darkMode={darkMode} />
+                    </main>
+                  </div>
+
+                  <footer className={`p-5 text-center mt-auto rounded-t-xl ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-800 text-white'}`}>
+                    <p>&copy; {new Date().getFullYear()} Humanity's Last Hope | Official. All rights reserved.</p>
+                  </footer>
+                </div>
+              );
+            };
+
+            // Render the App component into the root div
+            ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+        };
+    </script>
+</body>
+</html>
+
+
